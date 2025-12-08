@@ -4,7 +4,7 @@ Author: **Vector 35, Inc.**
 ## Description:
 Tantō is a plugin for [Binary Ninja](https://binary.ninja/) that slices programs so you can understand them faster.
 
-<img align="center" src="https://github.com/Vector35/tanto/blob/master/tanto_preview.png?raw=true">
+![slices](https://github.com/Vector35/tanto/blob/master/tanto_preview.png?raw=true)
 
 For a more detailed explanation of what Tantō does, please check out [this blog post](https://binary.ninja/2022/06/20/introducing-tanto.html).
 
@@ -25,3 +25,7 @@ This plugin has been released under the [MIT license](./LICENSE.txt).
 ## Insomni'Hack 2025 Slides
 
 [Here are the slides](./A%20Slice%20of%20Modern%20Program%20Analysis%20-%20Insomni%27hack%202025.pdf) for the talk [@ElykDeer](https://github.com/ElykDeer) gave at Insomni'Hack 2025: ["A Slice of" Modern Program Analysis](https://www.youtube.com/watch?v=I0PoE0IdtmE)
+
+## Original Blog Post / Documentation
+
+[Here's the original blog post](https://binary.ninja/2022/06/20/introducing-tanto.html) announcing Tanto and explaining how to use the original two slice types, Variable Slices and Basic Block Slices.
