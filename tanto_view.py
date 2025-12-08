@@ -26,7 +26,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout
 from PySide6.QtGui import QPalette, QPainter
 from PySide6.QtCore import Qt
 
-from binaryninja import BinaryView, Settings
+from binaryninja import BinaryView, Settings, SSAVariable
 from binaryninja.log import Logger, log_error
 from binaryninja.enums import FunctionGraphType
 from binaryninja.function import DisassemblySettings, FunctionViewType, Variable
@@ -367,11 +367,18 @@ class TantoView(QWidget, View):
                             menu_group: str = "", menu_order: int = 0):
 
     def _variable_action_wrapper(action: Callable[['BinaryView', Variable], None], context):
-      action(tanto.helpers.get_current_binary_view(), Variable.from_core_variable(tanto.helpers.get_current_il_function(), context.token.localVar))
+      var = Variable.from_core_variable(tanto.helpers.get_current_il_function(), context.token.localVar)
+      varText = str(context.token.token)
+      if "#" in varText:
+        var = SSAVariable(var, int(varText.split("#")[-1]))
+      action(tanto.helpers.get_current_binary_view(), var)
 
     def _variable_is_valid_wrapper(is_valid: Optional[Callable[['BinaryView', Variable], bool]], context) -> bool:
       if (bv := tanto.helpers.get_current_binary_view()) is None or not context.token.localVarValid or (var := context.token.localVar) is None or (func := tanto.helpers.get_current_il_function()) is None:
         return False
+      varText = str(context.token.token)
+      if "#" in varText:
+        var = SSAVariable(var, int(varText.split("#")[-1]))
       return is_valid is None or is_valid(bv, Variable.from_core_variable(func, var))
 
     self.__register_action(name, partial(_variable_action_wrapper, action), partial(_variable_is_valid_wrapper, is_valid), menu_group, menu_order)
