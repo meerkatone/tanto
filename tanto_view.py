@@ -30,7 +30,7 @@ from binaryninja import BinaryView, Settings
 from binaryninja.log import Logger, log_error
 from binaryninja.enums import FunctionGraphType
 from binaryninja.function import DisassemblySettings, FunctionViewType, Variable
-from binaryninja.interaction import ChoiceField, TextLineField, get_form_input, get_text_line_input
+from binaryninja.interaction import get_choice_input, get_text_line_input
 
 from functools import partial
 from typing import Callable, Optional
@@ -113,6 +113,7 @@ class TantoView(QWidget, View):
     return menus.OptionsWidget(self)
 
   def getHeaderSubtypeWidget(self) -> ViewPaneHeaderSubtypeWidget:
+    self.slice_menu = menus.SliceMenuWidget(self, self.actionHandler)
     return self.slice_menu
 
   def navigate(self, offset: int) -> bool:
@@ -151,28 +152,18 @@ class TantoView(QWidget, View):
     cls.slice_providers.sort(key=lambda s: s[0])
 
   def create_slice(self, create_option_callback: Callable[[str], None]):
-    # Prompt user for slice name and type
-    slice_name_f = TextLineField("Slice Name")
-
-    slice_type_f = ChoiceField("Slice Type", [slicer_name for slicer_name, _ in self.slice_providers if Settings().get_bool(f"tanto.{slicer_name}.enabled")])
-    if not get_form_input([None, None, slice_name_f, slice_type_f], menus.NEW_SLICE_TEXT):
-      return
-    if any([slice_name_f.result == slice_name for slicer_name, slice_name, slicer in self.slices]):
-      self.log.log_alert("Slices require unique names")
+    if (index := get_choice_input("Select a slice type to create:", menus.NEW_SLICE_TEXT, [slicer_name for slicer_name, _ in self.slice_providers if Settings().get_bool(f"tanto.{slicer_name}.enabled")])) is None:
       return
 
-    slice_name = slice_name_f.result
-    slicer_name, slicer_class = [s for s in self.slice_providers if Settings().get_bool(f"tanto.{s[0]}.enabled")][slice_type_f.result]
-
-    if slice_name == "":
-      names = [e_name for e_slicer_name, e_name, _ in self.slices if e_slicer_name == slicer_name]
-      for i in range(1, 1000):
-        slice_name = f"{slicer_name} {i}"
-        if slice_name not in names:
-          break
-      else:
-        self.log.log_alert("Could not generate unique slice name")
-        return
+    slicer_name, slicer_class = [s for s in self.slice_providers if Settings().get_bool(f"tanto.{s[0]}.enabled")][index]
+    names = [e_name for e_slicer_name, e_name, _ in self.slices if e_slicer_name == slicer_name]
+    for i in range(1, 1000):
+      slice_name = f"{slicer_name} {i}"
+      if slice_name not in names:
+        break
+    else:
+      self.log.log_alert("Could not generate unique slice name")
+      return
 
     # Change dropdown/menu selection text to new slice
     create_option_callback(slice_name)

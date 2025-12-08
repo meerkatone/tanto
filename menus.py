@@ -196,4 +196,10 @@ class SliceMenuWidget(ViewPaneHeaderSubtypeWidget):
     self.menu.updateStatus()
 
   def get_current_slice_name(self) -> str:
-    return list(self.menu.m_menu.getActions())[self.menu.index]
+    try:
+      return list(self.menu.m_menu.getActions())[self.menu.index]
+    except:
+      return NEW_SLICE_TEXT
+
+  def __del__(self):
+    print("SliceMenuWidget deleted!")
