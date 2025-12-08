@@ -21,9 +21,9 @@
 import tanto
 from tanto.tanto_view import TantoView
 
-from binaryninja import FlowGraph, FlowGraphNode
+from binaryninja import FlowGraph, FlowGraphNode, EdgeStyle
 from binaryninja.function import Function, DisassemblyTextLine
-from binaryninja.enums import BranchType
+from binaryninja.enums import BranchType, EdgePenStyle, ThemeColor
 
 
 class ScatterSlice(tanto.slices.Slice):
@@ -96,7 +96,7 @@ class ScatterSlice(tanto.slices.Slice):
           callee_node = nodes[callee]
           edge = (function, callee)
           if edge not in added_edges:
-            node.add_outgoing_edge(BranchType.CallDestination, callee_node)
+            node.add_outgoing_edge(BranchType.UserDefinedBranch, callee_node, EdgeStyle(EdgePenStyle.DashLine, 2, ThemeColor.UnconditionalBranchColor))
             added_edges.add(edge)
 
     return new_graph
