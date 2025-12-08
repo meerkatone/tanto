@@ -174,7 +174,8 @@ def get_selected_inst() -> ILInstruction:
   view_context = UIContext.activeContext()
   if view_context is not None and view_context.getCurrentView() is not None:
     if (instr_index := view_context.getCurrentView().getCurrentILInstructionIndex()) != BN_INVALID_EXPR:
-      return get_current_il_function()[instr_index]
+      if (func := get_current_il_function()) is not None:
+        return func[instr_index]
 
 
 def get_selected_expr() -> ILInstruction:
